@@ -4,6 +4,7 @@
     let canvas, ctx;
     let isScreensaverActive = false;
     let animationId;
+    let styleElement;
 
     const groupCount = 3;
     const numPoints = 4;
@@ -36,13 +37,27 @@
         idleTimer = setTimeout(startScreensaver, IDLE_TIME_LIMIT);
     }
 
-    function startScreensaver() {
+function startScreensaver() {
         isScreensaverActive = true;
+
+        // 強制的にカーソルを消すためのCSSを注入
+        styleElement = document.createElement('style');
+        styleElement.innerHTML = `
+            * { cursor: none !important; }
+        `;
+        document.head.appendChild(styleElement);
+
+        // キャンバスの作成
         canvas = document.createElement('canvas');
         Object.assign(canvas.style, {
-            position: 'fixed', top: '0', left: '0', zIndex: '9999',
-            pointerEvents: 'none', backgroundColor: 'transparent'
+            position: 'fixed', 
+            top: '0', 
+            left: '0', 
+            zIndex: '9999',
+            pointerEvents: 'none', 
+            backgroundColor: 'transparent'
         });
+        
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         document.body.appendChild(canvas);
@@ -54,7 +69,16 @@
     function stopScreensaver() {
         isScreensaverActive = false;
         cancelAnimationFrame(animationId);
-        if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
+
+        // 注入したスタイルを削除
+        if (styleElement && styleElement.parentNode) {
+            styleElement.parentNode.removeChild(styleElement);
+        }
+
+        // キャンバスを削除
+        if (canvas && canvas.parentNode) {
+            canvas.parentNode.removeChild(canvas);
+        }
     }
 
     function initLineGroups() {
