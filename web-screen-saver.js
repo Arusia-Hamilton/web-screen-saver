@@ -172,3 +172,4 @@ function startScreensaver() {
 
     window.onload = init;
 })();
+
